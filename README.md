@@ -26,8 +26,13 @@ Running the project is simple, all you need to do is run these two commands on t
 
   ```
     npm run watcher
+  ```
+
+  ```
     npm run server
   ```
+
+  That should bundle the project and start the server.
 
   ## Opening the project:
 
