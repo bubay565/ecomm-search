@@ -34,15 +34,8 @@ Running the project is simple, all you need to do is run these two commands on t
 
   That should bundle the project and start the server.
 
-  ## Opening the project:
-
-  Client:
+  * Client:
   http://localhost:8080/ 
   
-  Server: 
+  * Server: 
   http://localhost:8080/api/data 
-
-
-
-  # Good Luck!
-
