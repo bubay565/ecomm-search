@@ -1,46 +1,66 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-const request = require('superagent')
-const payload = require('./payload.JSON')
-var _ = require('lodash');
+import React, { Component } from 'react';
+import './css/App.css'
+import Loading from 'react-loading'
+import lodash from 'lodash'
 
 
-class SearchPage extends React.Component {
+class SearchPage extends Component {
 
+  state = {
+    payload: [],
+    loading: true
+  }
 
+  componentDidMount() {
+    fetch('./payload.JSON')
+      .then(res => res.json())
+      .then(data => this.setState({ payload: data, loading: false }))
+  }
+  
   render() {
-    var data = payload
-
-    request.get('http://localhost:8080/api/data', (err, res) =>{
-     //could get the json from the server instead ?
-    });
-
-    let productList = [];
-    for(var i = 0; i < data.length; i++ ){
-       var currentProduct = data[i]
-      var details = currentProduct
-        console.log(currentProduct)
-      productList.push(<div key={0} style={{border : 'black 1px solid', display: 'inline-block', padding: "10px",
-      margin: "10px"}}>
-        <img  style={{height: '70px'}} src={'http://media.4rgos.it/s/Argos/'+ details.id + '_R_SET%3Fw=220&h=220'} />
-          <div> Title {details.attributes.name} </div>
-        <div> Price: {details.attributes.price} </div>
-        <div> StarRatings: {_.ceil(details.attributes.avgRating)} </div>
-             <div> Reviews: {_.ceil(details.attributes.reviewsCount)} </div>
-        <a href={"http://www.argos.co.uk/product/"+ details.id}> More Info abut the product! </a>
-        <br />
-        <button> <b>Add to trolley </b> </button>
-         </div>)
-    }
-
-    request.get('/api/data', (err, res) =>{
-      // debugger;
-    });
-    return (<center><h1> Argos Search Page </h1> <div>Filter by... Price, starRating and FastTrack..</div>
-      <input style={{display: "block",
-      "font-size": "20px"}}
-      value="Seach for.." />
-      {productList} </center>)
+    const products = this.state.payload;
+    return(
+      <div className="container">
+          <header className="header">
+              <img className="logo" src={require('./assets/argos_logo.png')} alt="Argos Digital logo" />
+              
+          </header>
+      
+          <main className="content">
+            {products.length === 0 ?
+              <Loading delay={200} type='spin' color='#222' className='loading' />
+              :
+              <div className="products">
+                  <ol className="product-grid">
+                      {products.map((product) => 
+                          <li key={product.id}>
+                              <div className="product">
+                                  <div className="product-top">
+                                      <img className="product-img" src={`http://media.4rgos.it/s/Argos/${product.id}_R_SET%3Fw=220&h=220`} alt={product.name} />
+                                  </div>
+                                  <div className="product-bottom">
+                                      <div className="product-title">{product.attributes.name}</div>
+                                      <div className="product-price">Price: £{product.attributes.price}</div>
+                                      <div className="product-ratings"> StarRatings: {lodash.ceil(product.attributes.avgRating)} </div>
+                                      <div className="product-reviews"> Reviews: {lodash.ceil(product.attributes.reviewsCount)} </div>
+                                      <div className="product-info">
+                                          <a href={`http://www.argos.co.uk/product/${product.id}`}>More Info abut the product!</a>
+                                          <button className="purchaseBtn" type="button" id="addToCart" name="addToCart">
+                                              <span className="srOnly">Add to trolley</span>
+                                              <i className="fa fa-shopping-cart" aria-hidden="true"></i>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </li>
+                      )}
+                  </ol>
+              </div>
+            }
+          </main>
+          <footer className="footer">footer</footer>
+      </div>
+  )
   }
 }
 
