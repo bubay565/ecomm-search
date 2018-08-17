@@ -34,6 +34,12 @@ class SearchPage extends Component {
         this.setState({ payload });
     }
   }
+
+  onChangeFilter = (filter) => {
+    const { payload } = this.state;
+    const filteredProducts = payload.sort((productA, productB) => productB.attributes[filter] - productA.attributes[filter])
+    this.setState({ filter, payload: filteredProducts })
+}
   
   render() {
     const products = this.state.payload;
@@ -64,6 +70,14 @@ class SearchPage extends Component {
                               <i className="fa fa-search" aria-hidden="true"></i>
                           </button>
                       </form>
+                  </div>
+                  <div className="filterContainer">
+                    <select className="filterInput" onChange={(event) => {this.onChangeFilter(event.target.value)}}>
+                        <option value="">Filter</option>
+                        <option value="price">Price</option>
+                        <option value="rating">Star rating</option>
+                        <option value="fastTrack">FastTrack</option>
+                    </select>
                   </div>
               </div>
           </header>
