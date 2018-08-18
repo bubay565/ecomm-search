@@ -16,9 +16,20 @@ class SearchPage extends Component {
   }
 
   componentDidMount() {
-    fetch('./payload.JSON')
-      .then(res => res.json())
-      .then(data => this.setState({ payload: data, loading: false }))
+    this.fetchPayload()
+      .then(payload => this.setState({ payload, loading: false }))
+      .catch(error => this.setState({ error }))        
+  }
+
+  fetchPayload = async () => {
+    const response = await fetch('/api/data');
+    const payload = await response.json();
+
+    if (response.status !== 200) {
+        this.setState({ loading: false, error : true });
+    }
+    
+    return payload;
   }
 
   onChangeText = (searchQuery) => {
@@ -31,7 +42,7 @@ class SearchPage extends Component {
     if(searchQuery) {
         const match = new RegExp(escapeRegExp(searchQuery), 'i');
         const displayProducts = payload.filter(product => match.test(product.attributes.name));
-        this.setState({ payload : displayProducts});
+        this.setState({ payload : displayProducts });
     } else {
         this.setState({ payload });
     }
@@ -41,7 +52,7 @@ class SearchPage extends Component {
     const { payload } = this.state;
     const filteredProducts = payload.sort((productA, productB) => productB.attributes[filter] - productA.attributes[filter])
     this.setState({ filter, payload: filteredProducts })
-}
+  }
   
   render() {
     const products = this.state.payload;
@@ -68,7 +79,7 @@ class SearchPage extends Component {
                 />
               :
                 <ProductList 
-                  products={products} 
+                  products={products}
                 />
             }
           </main>
