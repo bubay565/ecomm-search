@@ -1,8 +1,9 @@
 import React from 'react'
 import SearchForm from './SearchForm'
+import SearchSort from './SearchSort'
 
 
-const SearchBar = ({ onHandleSubmit, onChangeText, onChangeFilter, searchQuery }) => {
+const SearchBar = ({ onHandleSubmit, onChangeText, onSortBy, onFilterBy, searchQuery, trolley, viewTrolley }) => {
     return (
         <div className="searchBar">
             <div className="searchContaner">
@@ -13,12 +14,12 @@ const SearchBar = ({ onHandleSubmit, onChangeText, onChangeFilter, searchQuery }
                 /> 
             </div>
             <div className="filterContainer">
-                <select className="filterInput" onChange={(event) => {onChangeFilter(event.target.value)}}>
-                    <option value="">Filter</option>
-                    <option value="price">Price</option>
-                    <option value="rating">Star rating</option>
-                    <option value="fastTrack">FastTrack</option>
-                </select>
+                <SearchSort 
+                    onSortBy={onSortBy}
+                    onFilterBy={onFilterBy}
+                    trolley={trolley}
+                    viewTrolley={viewTrolley}
+                />                
             </div>
         </div>
     )

@@ -4,15 +4,18 @@ import Loading from 'react-loading'
 import escapeRegExp from 'escape-string-regexp'
 import ProductList from './ProductList'
 import Logo from './Logo'
-import SearchBar from './SearchBar';
-
+import SearchBar from './SearchBar'
+import UserTrolley from './UserTrolley'
+import Footer from './Footer'
 
 class SearchPage extends Component {
 
   state = {
     searchQuery : '',
     payload: [],
-    loading: true
+    loading: true,
+    trolley: [],
+    displayTrolley: false
   }
 
   componentDidMount() {
@@ -38,21 +41,47 @@ class SearchPage extends Component {
 
   onHandleSubmit = (event) => {
     event.preventDefault();
-    const {searchQuery, payload} = this.state;
+    const { searchQuery, payload } = this.state;
     if(searchQuery) {
         const match = new RegExp(escapeRegExp(searchQuery), 'i');
         const displayProducts = payload.filter(product => match.test(product.attributes.name));
         this.setState({ payload : displayProducts });
+    } 
+  }
+
+  onFilterBy = (filter) => {
+    const { payload } = this.state;    
+    const filteredProducts = payload.filter(product => product.attributes[filter] === true)
+    this.setState({ payload: filteredProducts })
+  }
+
+  onSortBy = (filter) => {
+    const { payload } = this.state;
+    const filteredProducts = payload.sort((productA, productB) => productB.attributes[filter] - productA.attributes[filter])
+    this.setState({ payload: filteredProducts })
+  }
+
+  onAddToTrolley = (product, increment = true) => {
+    const currTrolley = this.state.trolley;
+    const itemInTrolley = currTrolley.some(item => {
+      if(item.id === product.id){
+        item.quantity = increment ? +(item.quantity) + 1 : +(item.quantity) - 1;
+      }
+      return item.id === product.id;
+    });
+    
+    if( !itemInTrolley ) {
+      this.updateTrolleyState([...currTrolley, product]);
     } else {
-        this.setState({ payload });
+      this.updateTrolleyState(currTrolley);
     }
   }
 
-  onChangeFilter = (filter) => {
-    const { payload } = this.state;
-    const filteredProducts = payload.sort((productA, productB) => productB.attributes[filter] - productA.attributes[filter])
-    this.setState({ filter, payload: filteredProducts })
-  }
+  updateTrolleyState = (trolley) => this.setState({ trolley })
+
+  displayTrolley = () => this.setState({ displayTrolley: true })
+
+  closeTrolley = () => this.setState({ displayTrolley: false })
   
   render() {
     const products = this.state.payload;
@@ -62,9 +91,12 @@ class SearchPage extends Component {
               <Logo/>
               <SearchBar 
                 onHandleSubmit={this.onHandleSubmit}
-                onChangeFilter={this.onChangeFilter}
+                onSortBy={this.onSortBy}
+                onFilterBy={this.onFilterBy}
                 onChangeText={this.onChangeText}
                 searchQuery={this.state.searchQuery}
+                trolley={this.state.trolley}
+                viewTrolley={this.displayTrolley}
               />
           </header>
       
@@ -80,10 +112,19 @@ class SearchPage extends Component {
               :
                 <ProductList 
                   products={products}
-                />
+                  onAddToTrolley={this.onAddToTrolley} 
+                />                
+            }
+            
+            {this.state.displayTrolley && 
+              <UserTrolley 
+                trolley={this.state.trolley}
+                onAddToTrolley={this.onAddToTrolley}
+                closeTrolley={this.closeTrolley}
+              />
             }
           </main>
-          <footer className="footer">footer</footer>
+          <footer className="footer"><Footer /></footer>
       </div>
     )
   }
